@@ -1,45 +1,33 @@
-name: Deploy to GitHub Pages
-
+name: Deploy Angular to Pages
 on:
   push:
-    branches: [ main ]   # deploys when you merge to main
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install deps
-        run: npm ci || npm install --legacy-peer-deps
-
-      - name: Build (prod)
-        # set base-href to /<repo>/ for GitHub Pages
-        run: npx ng build --configuration=production --base-href "/YOUR_REPO_NAME/"
-
-      - name: Add SPA 404 fallback
-        # GitHub Pages needs 404.html to route SPA deep-links
-        run: |
-          outDir=$(ls -d dist/*/browser dist/* 2>/dev/null | head -n1)
-          cp "$outDir/index.html" "$outDir/404.html"
-
-      - name: Upload Pages artifact
+          node-version: 20
+          cache: npm
+      - run: npm ci || npm install --legacy-peer-deps
+      - run: npx ng build --configuration=production --base-href /worldmap/
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: |
-            dist/*/browser
-            dist/*
-
+          path: dist/**/browser
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -47,6 +35,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v4
