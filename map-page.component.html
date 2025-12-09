@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="left">
+    <app-world-map (countrySelected)="onCountrySelected($event)"></app-world-map>
+  </div>
+  <div class="right">
+    <ng-container *ngIf="selected; else placeholder">
+      <h2>{{ selected.name }}</h2>
+      <p><strong>ISO2:</strong> {{ selected.iso2 }}</p>
+      <p><strong>Capital:</strong> {{ selected.capital }}</p>
+      <p><strong>Region:</strong> {{ selected.region }}</p>
+      <p><strong>Income Level:</strong> {{ selected.incomeLevel }}</p>
+      <p><strong>Latitude:</strong> {{ selected.latitude }}</p>
+      <p><strong>Longitude:</strong> {{ selected.longitude }}</p>
+    </ng-container>
+    <ng-template #placeholder>
+      <p>Select a country to see details.</p>
+    </ng-template>
+  </div>
+</div>
